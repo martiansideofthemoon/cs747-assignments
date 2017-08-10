@@ -23,7 +23,7 @@ FLAGS = ${OSFLAGS} ${CFLAGS} -std=c++11
 LDFLAGS = -lgsl -lgslcblas
 
 #Sources
-SRCS =	bandit-agent.cpp
+SRCS =	bandit-agent.cpp algorithm-data.cpp
 
 #Objects
 OBJS = $(SRCS:.cpp=.o)

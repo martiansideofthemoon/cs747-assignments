@@ -15,6 +15,8 @@
 #include "gsl/gsl_rng.h"
 #include "gsl/gsl_randist.h"
 
+#include "algorithm-data.h"
+
 #define MAXHOSTNAME 256
 
 using namespace std;
@@ -22,7 +24,7 @@ using namespace std;
 void options(){
 
   cout << "Usage:\n";
-  cout << "bandit-agent\n"; 
+  cout << "bandit-agent\n";
   cout << "\t[--numArms numArms]\n";
   cout << "\t[--randomSeed randomSeed]\n";
   cout << "\t[--horizon horizon]\n";
@@ -45,7 +47,7 @@ bool setRunParameters(int argc, char *argv[], int &numArms, int &randomSeed, uns
     //cout << string(argv[ctr]) << "\n";
 
     if(string(argv[ctr]) == "--help"){
-      return false;//This should print options and exit.
+      return false; //This should print options and exit.
     }
     else if(string(argv[ctr]) == "--numArms"){
       if(ctr == (argc - 1)){
@@ -108,21 +110,66 @@ bool setRunParameters(int argc, char *argv[], int &numArms, int &randomSeed, uns
 
 /* ============================================================================= */
 /* Write your algorithms here */
-int sampleArm(string algorithm, double epsilon, int pulls, float reward, int numArms){
-  if(algorithm.compare("rr") == 0){
+int sampleArm(string algorithm, double epsilon, int pulls, float reward,
+              int numArms, int prevArm, BaseAlgorithm* baseData, gsl_rng* randGenerator) {
+  if(algorithm.compare("rr") == 0) {
     return(pulls % numArms);
   }
-  else if(algorithm.compare("epsilon-greedy") == 0){
+  else if(algorithm.compare("epsilon-greedy") == 0) {
+    EpsilonGreedy* data = static_cast<EpsilonGreedy*>(baseData);
+    if (prevArm != -1) {
+      data->updateHistory(prevArm, reward);
+    }
+    // data->BaseAlgorithm::printArmHistory();
+    if(gsl_rng_uniform(randGenerator) < epsilon || data->currentBestObjective == -1) {
+      // This happens with probability epsilon
+      float randomArm = numArms * gsl_rng_uniform(randGenerator);
+      return ((int) randomArm);
+    } else {
+      // This happens with probability 1-epsilon
+      return data->currentBestArm;
+    }
     return(pulls % numArms);
   }
-  else if(algorithm.compare("UCB") == 0){
-    return(pulls % numArms);
+  else if(algorithm.compare("UCB") == 0) {
+    UCB* data = static_cast<UCB*>(baseData);
+    if (prevArm != -1) {
+      data->updateHistory(prevArm, reward, pulls);
+    }
+    if (pulls < numArms) {
+      // For initial pulling of all arms
+      return pulls;
+    } else {
+      // UCB objective implemented in updateHistory() function
+      data->BaseAlgorithm::printArmHistory();
+      data->BaseAlgorithm::printObjective();
+      return data->currentBestArm;
+    }
   }
-  else if(algorithm.compare("KL-UCB") == 0){
-    return(pulls % numArms);
+  else if(algorithm.compare("KL-UCB") == 0) {
+    KL_UCB* data = static_cast<KL_UCB*>(baseData);
+    if (prevArm != -1) {
+      data->updateHistory(prevArm, reward, pulls);
+    }
+    if (pulls < numArms) {
+      // For initial pulling of all arms
+      return pulls;
+    } else {
+      // KL-UCB objective implemented in updateHistory() function
+      data->BaseAlgorithm::printArmHistory();
+      data->BaseAlgorithm::printObjective();
+      return data->currentBestArm;
+    }
   }
-  else if(algorithm.compare("Thompson-Sampling") == 0){
-    return(pulls % numArms);
+  else if(algorithm.compare("Thompson-Sampling") == 0) {
+    ThompsonSampling* data = static_cast<ThompsonSampling*>(baseData);
+    if (prevArm != -1) {
+      data->updateHistory(prevArm, reward, randGenerator);
+      data->BaseAlgorithm::printArmHistory();
+      return data->currentBestArm;
+    } else {
+      return 0;
+    }
   }
   else{
     return -1;
@@ -130,6 +177,22 @@ int sampleArm(string algorithm, double epsilon, int pulls, float reward, int num
 }
 
 /* ============================================================================= */
+
+BaseAlgorithm* setAlgorithmData(string algorithm, int numArms) {
+  BaseAlgorithm* data;
+  if (algorithm.compare("epsilon-greedy") == 0) {
+    data = new EpsilonGreedy(numArms);
+  } else if (algorithm.compare("UCB") == 0) {
+    data = new UCB(numArms);
+  } else if (algorithm.compare("KL-UCB") == 0) {
+    data = new KL_UCB(numArms);
+  } else if (algorithm.compare("Thompson-Sampling") == 0) {
+    data = new ThompsonSampling(numArms);
+  } else {
+    data = new BaseAlgorithm(numArms);
+  }
+  return data;
+}
 
 
 int main(int argc, char *argv[]){
@@ -154,7 +217,7 @@ int main(int argc, char *argv[]){
   int socketHandle;
 
   bzero(&remoteSocketInfo, sizeof(sockaddr_in));
-  
+
   if((hPtr = gethostbyname((char*)(hostname.c_str()))) == NULL){
     cerr << "System DNS name resolution not configured properly." << "\n";
     cerr << "Error number: " << ECONNREFUSED << "\n";
@@ -182,9 +245,14 @@ int main(int argc, char *argv[]){
   char recvBuf[256];
 
   float reward = 0;
-  unsigned long int pulls=0;
-  int armToPull = sampleArm(algorithm, epsilon, pulls, reward, numArms);
-  
+  unsigned long int pulls = 0;
+
+  BaseAlgorithm* data = setAlgorithmData(algorithm, numArms);
+  gsl_rng* randGenerator = gsl_rng_alloc(gsl_rng_mt19937);
+  gsl_rng_set(randGenerator, randomSeed);
+
+  int armToPull = sampleArm(algorithm, epsilon, pulls, reward, numArms, -1, data, randGenerator);
+
   sprintf(sendBuf, "%d", armToPull);
 
   cout << "Sending action " << armToPull << ".\n";
@@ -197,16 +265,17 @@ int main(int argc, char *argv[]){
     cout<<"Num of  pulls "<<pulls<<".\n";
 
 
-    armToPull = sampleArm(algorithm, epsilon, pulls, reward, numArms);
+    armToPull = sampleArm(algorithm, epsilon, pulls, reward, numArms, armToPull, data, randGenerator);
 
     sprintf(sendBuf, "%d", armToPull);
     cout << "Sending action " << armToPull << ".\n";
   }
-  
+
+  delete data;
   close(socketHandle);
 
   cout << "Terminating.\n";
 
   return 0;
 }
-          
+
