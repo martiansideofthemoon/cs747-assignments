@@ -202,10 +202,9 @@ int main(int argc, char *argv[]){
 
     //    cout << i << ": " << armToPull << ", " << reward << "\n";
     giveRewardToAgent(clientSock, reward, (i + 1));
+    double regret = bandit->getRegret();
+    cout << "Regret " << (i+1) << " = " << regret << "\n";
   }
-
-  double regret = bandit->getRegret();
-  cout << "Regret = " << regret << "\n";
   cout << "Terminating.\n";
   
   delete bandit;

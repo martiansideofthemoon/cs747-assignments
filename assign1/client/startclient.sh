@@ -10,9 +10,8 @@ algorithm=$6
 epsilon=$7
 outputFile=$PWD/clientlog.txt
 
-echo $outputFile
 #echo "Inside Client"
 
 cmd="./bandit-agent --numArms $numArms --randomSeed $randomSeed --horizon $horizon --hostname $hostname --port $port --algorithm $algorithm --epsilon $epsilon"
-#echo $cmd
+echo $cmd
 $cmd > $outputFile &

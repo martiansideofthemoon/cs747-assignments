@@ -2,13 +2,13 @@
 
 PWD=`pwd`
 
-horizon=400
+horizon=100000
 port=5001
 nRuns=100
 hostname="localhost"
-banditFile="$PWD/data/instance-5.txt"
+banditFile="$PWD/data/instance-25.txt"
 
-algorithm="KL-UCB"
+algorithm="epsilon-greedy"
 # Allowed values for algorithm parameter(case-sensitive)
 # 1. epsilon-greedy 
 # 2. UCB 
@@ -28,9 +28,9 @@ OUTPUTFILE=$PWD/serverlog.txt
 randomSeed=0
 
 pushd $SERVERDIR
-cmd="./startserver.sh $numArms $horizon $port $banditFile $randomSeed $OUTPUTFILE &"
+cmd="./startserver.sh $numArms $horizon $port $banditFile $randomSeed $OUTPUTFILE"
 #echo $cmd
-$cmd 
+$cmd
 popd
 
 sleep 1

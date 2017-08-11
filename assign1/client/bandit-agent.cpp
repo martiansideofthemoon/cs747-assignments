@@ -129,7 +129,6 @@ int sampleArm(string algorithm, double epsilon, int pulls, float reward,
       // This happens with probability 1-epsilon
       return data->currentBestArm;
     }
-    return(pulls % numArms);
   }
   else if(algorithm.compare("UCB") == 0) {
     UCB* data = static_cast<UCB*>(baseData);
