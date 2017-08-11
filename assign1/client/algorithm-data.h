@@ -6,7 +6,7 @@
 #include "gsl/gsl_randist.h"
 
 #define THRESHOLD 10e-6
-#define CONSTANT 0
+#define CONSTANT 3
 
 using std::vector;
 using std::cout;

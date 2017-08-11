@@ -2,13 +2,13 @@
 
 PWD=`pwd`
 
-horizon=100000
+horizon=400
 port=5001
 nRuns=100
 hostname="localhost"
 banditFile="$PWD/data/instance-5.txt"
 
-algorithm="Thompson-Sampling"
+algorithm="KL-UCB"
 # Allowed values for algorithm parameter(case-sensitive)
 # 1. epsilon-greedy 
 # 2. UCB 
@@ -24,8 +24,6 @@ SERVERDIR=./server
 CLIENTDIR=./client
 
 OUTPUTFILE=$PWD/serverlog.txt
-OUTPUTFILE2=$PWD/clientlog.txt
-ERRORFILE=$PWD/clienterror.txt
 
 randomSeed=0
 
@@ -38,7 +36,7 @@ popd
 sleep 1
 
 pushd $CLIENTDIR
-cmd="./startclient.sh $numArms $horizon $hostname $port $randomSeed $algorithm $epsilon $OUTPUTFILE2 $ERRORFILE &"
+cmd="./startclient.sh $numArms $horizon $hostname $port $randomSeed $algorithm $epsilon &"
 #echo $cmd
 $cmd > /dev/null 
 popd
