@@ -11,5 +11,5 @@ outputFile=$6
 
 cmd="./bandit-environment --numArms $numArms --randomSeed $randomSeed --horizon $horizon --banditFile $banditFile --port $port"
 #echo $cmd
-$cmd > $outputFile
+$cmd > $outputFile &
  

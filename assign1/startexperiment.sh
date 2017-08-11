@@ -6,9 +6,9 @@ horizon=100000
 port=5001
 nRuns=100
 hostname="localhost"
-banditFile="$PWD/data/instance-25.txt"
+banditFile="$PWD/data/instance-50.txt"
 
-algorithm="epsilon-greedy"
+algorithm="Thompson-Sampling"
 # Allowed values for algorithm parameter(case-sensitive)
 # 1. epsilon-greedy 
 # 2. UCB 
