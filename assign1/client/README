@@ -1,0 +1,23 @@
+Kalpesh Krishna
+140070017
+kalpeshk2011@gmail.com
+
+Run `make` to install the agent. `./startclient <list of parameters>` to run the program.
+
+Source Code
+-----------
+./bandit-agent.cpp
+./algorithm-data.cpp
+./algorithm-data.h
+
+Scripts / Makefile
+------------------
+./startclient.sh
+./Makefile
+
+Report
+------
+report/report.pdf
+arms_#_<algo>.log files are used to create plots
+arms_#<_zoom>?.pdf files contain actual plots, with files
+(# represents number of arms, <zoom> files focus on first 2000 horizon steps)
