@@ -14,7 +14,7 @@ def main():
     else:
         policy, value = batch_pi(mdp, args)
     for i, j in zip(value, policy):
-        print("%.7f\t%d" % (i, j))
+        print("%.10f\t%d" % (i, j))
 
 
 if __name__ == '__main__':

@@ -72,6 +72,8 @@ def linear_program(mdp, args):
     prob.solve()
     optimal_values = [v.varValue for v in values]
     optimal_policy = value_to_policy(mdp, optimal_values)
+    # Recomputing optimal values to obtain higher precision
+    optimal_values = policy_to_value(mdp, optimal_policy)
     return optimal_policy, optimal_values
 
 
