@@ -80,5 +80,6 @@ rpi & 6.50 & 1.95 \\
 \caption{Iterations for Convergence vs Batch Size across 100 MDP instances, compared with baselines}
 \end{table}
 \subsection{Conclusions}
+The decreasing iterations with batchsize was quite expected due to the graphs presented in class. \\
 I was quite surprised to see how fast HPI would converge, despite having 50 states in the MDP. However, observing the trend in BSPI, I realized that batchsize $= n$ is equivalent to HPI. Quite clearly for this MDP, HPI is the most suitable choice for rapid convergence. In some sense, this is not very intuitive, since one would not expect a greedy strategy to be optimal. However, since this is a just a 2-action MDP, it seems more likely that a greedy strategy will perform better than a randomised policy.
 \end{document}
