@@ -1,0 +1,84 @@
+\documentclass[11pt]{article}
+\usepackage{geometry, hyperref}
+ \geometry{
+ a4paper,
+ total={170mm,257mm},
+ left=20mm,
+ top=20mm,
+ }
+%Gummi|065|=)
+\title{\textbf{CS747 - Assignment 2}}
+\author{Kalpesh Krishna\\140070017\\kalpeshk2011@gmail.com}
+\date{}
+\usepackage{graphicx}
+\begin{document}
+
+\maketitle
+
+\section{Implementation}
+All algorithms were implemented in Python. A main script \texttt{planner.py} is called by \texttt{planner.sh} which in turns calls algorithms outlined in \texttt{algorithms.py}. \texttt{numpy} has been used everywhere for random number generation. \texttt{pulp} has been used to solve the LP problems.\\
+\texttt{generate.py} is used to randomly generate MDPs of 50 states. These MDPs have been place under \texttt{./data/MDP50\_i.txt}. Three scripts, \texttt{run\_hpi.py}, \texttt{run\_bspi.py}, \texttt{run\_rpi.py} were used for the experiments and detailed results are present in \texttt{./logs/}.
+\begin{itemize}
+\item \textbf{Linear Programming} - Since \texttt{pulp} suffers from a precision issue beyond 7 decimal places, the value function was regenerated from the optimal policy. (ref - \url{https://github.com/coin-or/pulp/issues/147})
+\item {RPI} - A binomial distribution was used with $p = 0.5$.
+\item {BSPI} - Leftmost batches were evaluated first. This is equivalent to evaluating the rightmost batches first. The batch having insufficient elements was the rightmost batch.
+\end{itemize}
+\section{PI Results}
+\subsection{Howard PI}
+Howard PI always converged in either 1 or 2 iterations. On an average, it took $1.67 \pm 0.47$ iterations.
+\subsection{Randomized PI}
+10 different random seeds were used while evaluating the 100 MDPs. There was a great variation across seeds. The following table shows the variation in the number of iterations across seeds.
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{ |c|c|c| } 
+ \hline
+ Seed & Mean & Std \\ 
+ \hline
+0 & 4.98 & 0.92 \\
+1 & 5.37 & 1.19 \\
+2 & 6.87 & 2.00 \\
+3 & 6.88 & 1.69 \\
+4 & 7.04 & 1.43 \\
+5 & 6.96 & 1.82 \\
+6 & 6.03 & 1.35 \\
+7 & 7.28 & 1.68 \\
+8 & 5.14 & 1.15 \\
+9 & 8.42 & 2.64 \\
+\hline
+All & 6.50 & 1.95 \\
+\hline 
+\end{tabular}
+\end{center}
+\caption{Iterations for Convergence vs Seed across 100 MDP instances}
+\end{table}
+\subsection{Batch Switching PI}
+There was a decrease in the number of iterations taken with an increase in batch size. This decrease was more prominent in the first few incremental steps.
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{ |c|c|c| } 
+ \hline
+ Batch Size & Mean & Std \\ 
+ \hline
+1 & 27.73 & 5.36 \\
+2 & 21.22 & 3.74 \\
+3 & 16.80 & 2.88 \\
+4 & 13.89 & 2.17 \\
+5 & 11.36 & 2.00 \\
+8 & 8.22 & 1.57 \\
+10 & 6.37 & 1.43 \\
+15 & 5.28 & 1.26 \\
+20 & 4.06 & 1.04 \\
+25 & 3.09 & 0.92 \\
+50 (hpi) & 1.67 & 0.47 \\
+\hline
+hpi & 1.67 & 0.47 \\
+\hline
+rpi & 6.50 & 1.95 \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Iterations for Convergence vs Batch Size across 100 MDP instances, compared with baselines}
+\end{table}
+\subsection{Conclusions}
+I was quite surprised to see how fast HPI would converge, despite having 50 states in the MDP. However, observing the trend in BSPI, I realized that batchsize $= n$ is equivalent to HPI. Quite clearly for this MDP, HPI is the most suitable choice for rapid convergence. In some sense, this is not very intuitive, since one would not expect a greedy strategy to be optimal. However, since this is a just a 2-action MDP, it seems more likely that a greedy strategy will perform better than a randomised policy.
+\end{document}
