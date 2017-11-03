@@ -33,7 +33,6 @@ def next_state(start):
         else:
             return 7
     elif start == 7:
-        print "Error"
         sys.exit(0)
 
 
