@@ -61,7 +61,7 @@ def expt2(n, weights, lmbda):
             weights = weights + alpha * update * e_trace
             state = next
             updates += 1
-            # print_estimate(weights)
+            print_estimate(weights)
     return weights
 
 
@@ -75,8 +75,3 @@ if expt == 1:
     weights = expt1(n, weights)
 else:
     weights = expt2(n, weights, lmbda)
-
-print "Weights"
-print weights[1:]
-print "Value Function"
-print_estimate(weights)
