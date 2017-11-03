@@ -16,7 +16,7 @@
 \maketitle
 
 \section{Implementation \& Results}
-Both algorithms use a learning rate $\alpha = 0.1$ and $\epsilon = 1/e$, where $e$ is the episode number. These choice of parameters lead to reasonable convergence. These parameters have been kept constant in this analysis. All the following plots have been averaged across 50 random seeds.
+Both algorithms use a learning rate $\alpha = 0.1$ and $\epsilon = 1/e$, where $e$ is the episode number. Higher values of $\alpha$ lead to faster convergence but with a lower accuracy (for $\lambda > 0.6$). These parameters have been kept constant in this analysis. All the following plots have been averaged across 50 random seeds.
 \subsection{Accumulating vs Replacing}
 In both instances and across all ten $\lambda$ values, no significant difference was observed by using replacing traces in place of accumulating traces. Here is the plot for instance $0$, $\lambda = 0.4$.
 \begin{center}
@@ -52,9 +52,9 @@ Again, plots for both instances followed by a zoomed in version of the plot afte
 \begin{center}
 \includegraphics[width=14cm]{instance1_qlearning_sarsa_zoom.pdf}
 \end{center}
-In both instances we observe a similar trend - both Q-learning and Sarsa(0.0) converge to the same amount, with Q-learning converging faster than Sarsa. Sarsa(0.9) converges to a sub-optimal reward faster than both Q-learning and Sarsa(0.0).\\
+In both instances we observe a similar trend - both Q-learning and Sarsa(0.0) converge to the same amount with a similar convergence rate. Sarsa(0.9) converges to a sub-optimal reward faster than both Q-learning and Sarsa(0.0).\\
 This is expected behaviour since Q-learning is similar to Sarsa(0.0) except for the off-policy / on-policy updates. The off-policy update probably converges faster since in the initial stages a sub-optimal policy is being followed and acting greedily with respect to the $Q(s,a)$ makes more sense rather than the action taken by the sub-optimal $\epsilon-$greedy policy.\\\\
 Faster convergence of higher values of lambda is expected since greater number of $Q(s,a)$ values are being updated in each update.\\
-I was expecting plots to be a lot smoother after 50 random seeds. I'd not expected higher values of $\lambda$ to converge to a slightly sub-optimal value. I suspect this might be because Sarsa($\lambda$), with high $\lambda$, converges to a good policy very quickly, making several updates on $Q(s,a)$. Since Sarsa($\lambda$) is a on-policy method, it makes its updates based on the current action taken, which are derived from a good policy (but not optimal). Due to updates in several dimensions in parallel, a smaller parameter space is explored and the system probably gets stuck at a local minima.\\
+I was expecting plots to be a lot smoother after 50 random seeds. I'd not expected higher values of $\lambda$ to converge to a slightly sub-optimal value. I suspect this might be because Sarsa($\lambda$), with high $\lambda$, converges to a good policy very quickly, making several updates on $Q(s,a)$. Since Sarsa($\lambda$) is a on-policy method, it makes its updates based on the current action taken, which are derived from a good policy (but not optimal). Due to updates in several dimensions in parallel, a smaller parameter space is explored and the system probably gets stuck at a local minima. A possible solution would be annealing the learning rate.\\
 For smaller values of $\lambda$, smaller updates are made on $Q(s,a)$ which slows down convergence. For $\lambda = 0$, only one parameter is updated per iteration. Hence a larger parameter space is being explored, reducing the chances of getting stuck in a local minima.
 \end{document}

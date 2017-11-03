@@ -3,12 +3,12 @@
 
 mkdir results
 i1_
-for((n=0;n<50;n++))
+for((n=45;n<46;n++))
 do
     echo "----------------    SARSA \0 $n    ------------------"
-    python3 ./server/server.py -port $((6000+$n)) -i 0 -rs $n -ne 1600 -q | tee "results/qlearning_0.1_rs$n.txt" &
+    python3 ./server/server.py -port $((6000+$n)) -i 1 -rs $n -ne 1600 -q | tee "results/i1_qlearning_0.1_rs$n.txt" &
     sleep 1
-    python3 ./client/client.py -port $((6000+$n)) -rs $n -gamma 1 -algo qlearning -lambda 0
+    ./startclient.sh -port $((6000+$n)) -rs $n -gamma 1 -algo qlearning -lambda 0
 done
 # for((n=0;n<50;n++))
 # do
