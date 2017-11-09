@@ -33,6 +33,7 @@ def next_state(start):
         else:
             return 7
     elif start == 7:
+        print "Error"
         sys.exit(0)
 
 
@@ -43,8 +44,7 @@ def expt1(n, weights):
         next = next_state(start)
         update = 0 + gamma * np.dot(weights, approx[next]) - np.dot(weights, approx[start])
         weights = weights + alpha * update * approx[start]
-        print(weights[1:].tolist())
-        # print_estimate(weights)
+        print_estimate(weights)
     return weights
 
 
